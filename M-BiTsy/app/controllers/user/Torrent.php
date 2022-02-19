@@ -300,7 +300,7 @@ class Torrent
             Redirect::autolink(URLROOT . "/torrent?id=$id", Lang::T("TORRENT_ID_GONE"));
         }
 
-        $torrname = $row['owner'];
+        $torrname = $row['name'];
         $shortname = CutName(htmlspecialchars($row["name"]), 45);
         
         $data = [
@@ -314,10 +314,10 @@ class Torrent
 
     public function deleteok()
     {
-        $torrentid = (int) $_POST["torrentid"];
+        $torrentid = (int) $_GET["id"];
         $delreason = $_POST["delreason"];
         $torrentname = $_POST["torrentname"];
-
+        
         if (Users::get("delete_torrents") == "no") {
             Redirect::autolink(URLROOT . "/torrent?id=$torrentid", Lang::T("NO_TORRENT_DELETE_PERMISSION"));
         }
@@ -328,15 +328,14 @@ class Torrent
             Redirect::autolink(URLROOT . "/torrent/delete?id=$torrentid", Lang::T("MISSING_FORM_DATA"));
         }
 
+        $owner = DB::raw('torrents', 'name, owner', ['id'=>$torrentid])->fetch();
         Torrents::deletetorrent($torrentid);
-        DB::raw('torrents', 'owner', ['id'=>$torrentid])->fetch();
         Logs::write(Users::get('username') . " has deleted torrent: ID:$torrentid - " . htmlspecialchars($torrentname) . " - Reason: " . htmlspecialchars($delreason));
         unlink(UPLOADDIR."/torrents/$torrentid.torrent");
 
-        if (Users::get('id') != $torrentid) {
-            $delreason = $_POST["delreason"];
-            $msg_shout = 'Your torrent ' . $torrentname . ' has been deleted by ' . Users::get('username') . $torrentname . ' was deleted by ' . Users::get('username') . ' Reason: $delreason';
-            DB::insert('messages', ['sender'=>0,'receiver'=>$torrentid,'added'=>TimeDate::get_date_time(), 'subject'=>'System', 'msg'=>$msg_shout, 'unread'=>'yes', 'location'=>'in']);
+        if (Users::get('id') === $owner['owner']) {
+            $msg_shout = "Your torrent " . $torrentname . " has been deleted by " . Users::get('username') . "/nReason: ".$_POST["delreason"]."";
+            DB::insert('messages', ['sender'=>0,'receiver'=>$owner['owner'],'added'=>TimeDate::get_date_time(), 'subject'=>'Torrent Deleted', 'msg'=>$msg_shout, 'unread'=>'yes', 'location'=>'in']);
         }
 
         Redirect::autolink(URLROOT . "/peer/uploaded?id=".Users::get('id')."", htmlspecialchars($torrentname) . " " . Lang::T("HAS_BEEN_DEL_DB"));
