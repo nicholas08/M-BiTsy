@@ -82,6 +82,21 @@ class TMDB
         return $cnf['images']['base_url'] . $size;
     }
 
+    // Find External id Like IMDB $tmdb->find('tt1877830');
+	public function find($id, $external_source = 'imdb_id'){
+		$found = array();
+		$result = $this->_call('find/'.$id, '&external_source='. urlencode($external_source));
+        // eg https://api.themoviedb.org/3/find/tt3107288?api_key=fc104461a1313e89bced780eb81a53a4&language=en-US&external_source=imdb_id
+		$found = [
+            'title' => $result["movie_results"][0]["original_title"],
+            'poster_path' => $result["movie_results"][0]["poster_path"],
+            'overview' => $result["movie_results"][0]["overview"],
+            'release_date' => $result["movie_results"][0]["release_date"],
+            'video' => $result["movie_results"][0]["video"],
+        ];
+		return $found;
+	}
+
     // Gets part of the info of the Movie, mostly used for the lazy load
     public function getMovieInfo($idMovie, $option = '', $append_request = '')
     {
