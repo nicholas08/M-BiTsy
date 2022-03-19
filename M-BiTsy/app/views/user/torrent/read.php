@@ -70,8 +70,11 @@ foreach ($data['selecttor'] as $torr) :
             <b><?php echo Lang::T("ADDED_BY"); ?>:</b>&nbsp; Unknown<br><?php
         }  ?>
         <b><?php echo Lang::T("LAST_CHECKED"); ?>: </b><?php echo date("d-m-Y H:i:s", TimeDate::utc_to_tz_time($torr["last_action"])); ?><br><br>
-        <b><?php echo Lang::T("CATEGORY"); ?>:</b>&nbsp;<?php echo $torr["cat_parent"]; ?> -> <?php echo $torr["cat_name"]; ?><br> <?php
-        if (empty($torr["lang_name"])) {
+        <b><?php echo Lang::T("CATEGORY"); ?>:</b>&nbsp;<?php echo $torr["cat_parent"]; ?> -> <?php echo $torr["cat_name"]; ?><br>
+        
+		<b><?php echo Lang::T("Tags"); ?>: </b><?php echo $data["tags"]; ?><br> <?php
+		
+		if (empty($torr["lang_name"])) {
              $torr["lang_name"] = "Unknown/NA";
         } ?>
         <b><?php echo Lang::T("LANG"); ?>:</b>&nbsp;<?php echo $torr["lang_name"]; ?><br> <?php

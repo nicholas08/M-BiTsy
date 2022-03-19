@@ -235,6 +235,14 @@ class Upload
                 DB::insert('files', ['torrent'=>$id, 'path'=>$internalname, 'filesize'=>$torrentsize]);
             }
 
+            // tags mod
+            $tags = $_POST['tags'];
+            if ($tags) {
+                foreach ($tags as $tag) {
+                    DB::insert('tags', ['name' => $tag, 'type' => 'torrent', 'torrentid'=> $id]);
+                }
+            }
+
             if ($nfo == 'yes') {
                 move_uploaded_file($nfofilename, "$nfo_dir/$id.nfo");
             }

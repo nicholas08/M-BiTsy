@@ -992,6 +992,21 @@ INSERT INTO `stylesheets` (`id`, `uri`, `name`) VALUES
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `tags`
+--
+
+CREATE TABLE `tags` (
+  `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT,
+  `name` varchar(25) NOT NULL DEFAULT '',
+  `type` varchar(25) NOT NULL DEFAULT 'torrent',
+  `torrentid` int(50) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `torrentid` (`torrentid`)
+) ENGINE=MyISAM;
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `tasks`
 --
 

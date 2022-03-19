@@ -58,6 +58,16 @@ class Torrent
             Redirect::autolink(URLROOT . "/torrent?id=$id", Lang::T("Bumped Torrent"));
         }
 
+		$stmt = Tags::getByTorrentId($id);
+		if ($stmt) {
+            $tags = '';
+            foreach ($stmt as $tag) {
+                $tags .= "<a href=".URLROOT."/search/tags?name=$tag[name]>$tag[name]</a>&nbsp;";
+            }
+        } else {
+            $tags = '---';
+        }
+
         $ts = TimeDate::modify('date', $row['last_action'], '+2 day');
         if ($ts > TT_DATE) {
             $scraper = "<br>
@@ -100,6 +110,7 @@ class Torrent
             'vip' => $vip,
             'freeleech' => $freeleech,
             'selecttor' => $torrent1,
+            'tags' => $tags,
             'scraper' => $scraper,
         ];
         View::render('torrent/read', $data, 'user');
@@ -150,6 +161,16 @@ class Torrent
 
         $shortname = CutName(htmlspecialchars($row["name"]), 40);
 
+		$stmt = Tags::getByTorrentId($id);
+		if ($stmt) {
+            $tags = '';
+            foreach ($stmt as $tag) {
+                $tags .= "<a href=".URLROOT."/search/tags?name=$tag[name]>$tag[name]</a>&nbsp;";
+            }
+        } else {
+            $tags = 'No Tags Added';
+        }
+
         if ($_GET["edited"]) { // todo
             Redirect::autolink(URLROOT . "/torrent?id=$id", Lang::T("TORRENT_EDITED_OK"));
         }
@@ -163,6 +184,7 @@ class Torrent
             'shortname' => $shortname,
             'langdrop' => $langdropdown,
             'id' => $id,
+            'tags' => $tags,
             'selecttor' => $torrent1,
         ];
         View::render('torrent/edit', $data, 'user');
@@ -234,14 +256,17 @@ class Torrent
                 }
             }
 
+            $tags = $_POST['tags'];
+            if ($tags) {
+                foreach ($tags as $tag) {
+                    DB::insert('tags', ['name' => $tag, 'type' => 'torrent', 'torrentid'=> $id]);
+                }
+            }
+
             $updateset['visible'] = $_POST["visible"] ? "yes" : "no";
             
             // youtube
-            
-                $updateset['tube'] = $_POST['tube'] ?? '';
-            
-
-            
+            $updateset['tube'] = $_POST['tube'] ?? '';
 
             if (Users::get("edit_torrents") == "yes") {
                 $updateset['freeleech'] = $_POST["freeleech"] ? 1 : 0;

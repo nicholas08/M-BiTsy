@@ -29,6 +29,15 @@ torrentmenu($data['id'], $torr['external']); ?>
     } ?>
     <br /><input type='file' name='nfofile' size='60'><br><br>
     <b><?php echo Lang::T("CATEGORIES")  ?>: </b><br><?php echo $data['catdrop']  ?><br><br>
+    <b><?php echo Lang::T("Tags"); ?>: </b><?php echo $data["tags"]; ?><br> <?php
+    $stmt = Tags::getAll(); ?>
+    <select class="form-select" id="validationTags" name="tags[]" multiple data-allow-clear="true" data-suggestions-threshold="0">
+        <option selected disabled hidden value="">Add All Tags</option> <?php
+        foreach ($stmt as $tag) {
+          echo "<option value=" . $tag['name'] . ">" . $tag['name'] . "</option>";
+        }?>
+    </select><br>
+
     <b><?php echo Lang::T("LANG")  ?>: </b><br>
     <?php echo $data['langdrop'] ?><br><br>
 </div>

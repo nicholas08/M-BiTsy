@@ -83,6 +83,20 @@ $category .= "</select>\n"; ?>
     </div>
 </div><br><?php
 
+// Tags Mod
+$stmt = Tags::getAll(); ?>
+<div class="mb-6 row">
+    <label for="tag" class="col-sm-2"><?php echo Lang::T("Tags") ?></label>
+    <div class="col-sm-6">
+    <select class="form-select" id="validationTags" name="tags[]" multiple data-allow-clear="true" data-suggestions-threshold="0">
+        <option selected disabled hidden value="">Choose a tag...</option> <?php
+        foreach ($stmt as $tag) {
+          echo "<option value=" . $tag['name'] . ">" . $tag['name'] . "</option>";
+        }?>
+    </select>
+    </div>
+</div><br> <?php
+
 $language = Lang::select(); ?>
 <div class="mb-6 row">
     <label for="type" class="col-sm-2"><?php echo Lang::T("LANGUAGE") ?></label>

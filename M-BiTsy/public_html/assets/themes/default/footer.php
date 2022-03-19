@@ -36,6 +36,10 @@ if (Config::get('RIGHTNAV')) {?>
 <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.6/highlight.min.js"></script>
 <script>hljs.initHighlightingOnLoad();</script>
 <script src="<?php echo URLROOT; ?>/assets/js/overlib.js"></script>
+<script type="module">
+      import Tags from "https://cdn.jsdelivr.net/gh/lekoala/bootstrap5-tags@master/tags.js";
+      Tags.init("select[multiple]");
+</script>
     <script>
         function updateShouts(){
             // Assuming we have #shoutbox

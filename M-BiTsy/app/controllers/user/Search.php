@@ -122,4 +122,50 @@ class Search
         View::render('search/browse', $data, 'user');
     }
 
+      public function tags()
+      {
+        // Checks
+        $this->check();
+        $name = $_GET['name'] ?? '';
+        if ($name == '') {
+            Redirect::autolink(URLROOT, Lang::T("NO_Tag"));
+        }
+		
+        // Get The Data
+        $stmt = DB::run("SELECT torrentid FROM tags WHERE name = ? GROUP BY torrentid", [$name])->fetchAll(); 
+        if (count($stmt) == 0) {
+            Redirect::autolink(URLROOT, Lang::T("NO_Tag"));
+        }
+
+        $array = array();
+        foreach($stmt as $item) {
+            array_push($array, $item['torrentid']);
+        }
+        $ids = implode(",", $array);
+        $prefix = ',';
+        if (substr($ids, 0, strlen($prefix)) == $prefix) {
+            $ids = substr($ids, strlen($prefix));
+        }
+
+        $stmt = DB::run("SELECT torrents.id, torrents.name, torrents.owner, torrents.external, torrents.size,
+                         torrents.seeders, torrents.leechers, torrents.times_completed, torrents.added, 
+                         users.username
+                         FROM torrents 
+                         LEFT JOIN users 
+                         ON torrents.owner = users.id
+                         WHERE torrents.id 
+                         IN ($ids) ");
+
+        if ($stmt->rowCount() == 0) {
+            Redirect::autolink(URLROOT, Lang::T("NO_TORRENT_FOUND"));
+        }
+
+        // Pass The Data
+        $data = [
+            'title' => Lang::T("Search Tags"),
+            'stmt' => $stmt,
+        ];
+          // send the data
+          View::render('search/tag', $data, 'user');
+      }
 }

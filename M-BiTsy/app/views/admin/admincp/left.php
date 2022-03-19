@@ -38,5 +38,6 @@ if (Users::get('class') == _ADMINISTRATOR) { ?>
     <li class="list-group-item"><a href="<?php echo URLROOT; ?>/admincomment"><img src="assets/images/admin/comments.png" border="0" width="20" height="20" alt="" />&nbsp;<b><?php echo Lang::T("LATEST_COMMENTS"); ?></b></a></li>
     <li class="list-group-item"><a href="<?php echo URLROOT; ?>/adminpeer"><img src="<?php echo URLROOT; ?>/assets/images/admin/peer_list.png" border="0" width="20" height="20" alt="" />&nbsp;<b><?php echo Lang::T("PEERS_LIST"); ?></b></a></li>
     <li class="list-group-item"><a href="<?php echo URLROOT; ?>/adminban/torrent"><img src="<?php echo URLROOT; ?>/assets/images/admin/banned_torrents.png" border="0" width="20" height="20" alt="" />&nbsp;<b><?php echo Lang::T("BANNED_TORRENTS"); ?></b></a></li>
+    <li class="list-group-item"><a href="<?php echo URLROOT; ?>/admintag"><i class='fa fa-tag'></i>&nbsp;<b><?php echo Lang::T("Torrent Tags"); ?></b></a></li>
     </ul>
 </div>
