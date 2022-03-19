@@ -83,11 +83,20 @@ class Download
             }
         }
 
+        // Check passkey
+        if (Users::get('passkey')) {
+            $passkey = Users::get('passkey');
+        } elseif ($_GET["passkey"]) {
+            $passkey = $_GET["passkey"];
+        } else {
+            $passkey = "";
+        }
+
         // Local Torrent To Add Passkey
-        if ($row["external"] != 'yes' && $_SESSION['loggedin']) {
+        if ($row["external"] != 'yes') {
             // Bencode
             $dict = Bencode::decode(file_get_contents($fn));
-            $dict['announce'] = sprintf(PASSKEYURL, Users::get("passkey"));
+            $dict['announce'] = sprintf(PASSKEYURL, $passkey);
             unset($dict['announce-list']);
             $data = Bencode::encode($dict);
             header('Content-Disposition: attachment; filename="' . $name . '"');
@@ -127,9 +136,8 @@ class Download
 
         $switchimage = UPLOADDIR . "/attachment/$file_hash.data";
         if (file_exists($switchimage)) {
-            list($width, $height) = getimagesize($plik); 
-            $new_width = $width * $percent;
-            $new_height = $height * $percent; ?> 
+            //list($width, $height) = getimagesize($plik); 
+            ?> 
             <img alt="test image" src="<?php echo data_uri($switchimage, $file_hash); ?>"> <?php
         }
     }
