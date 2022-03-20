@@ -75,13 +75,8 @@
 
       <span class="navbar-text"> <?php
       if (Users::get('id')) { 
-        if (Users::get("uploaded") > 0 && Users::get("downloaded") == 0) {
-            $userratio = 'Inf.';
-        } elseif (Users::get("downloaded") > 0) {
-          $userratio = number_format(Users::get("uploaded") / Users::get("downloaded"), 2);
-        } else {
-          $userratio = '---';
-        }
+        $userratio = Users::get("downloaded") > 0 ? number_format(Users::get("uploaded") / Users::get("downloaded"), 1) : "---";
+
         $userdownloaded = mksize(Users::get("downloaded"));
         $useruploaded = mksize(Users::get("uploaded"));
         $privacylevel = Lang::T(Users::get("privacy")); ?>

@@ -17,16 +17,7 @@ Style::begin($title);
     while ($a = $res->fetch(PDO::FETCH_ASSOC)) {
         ++$num;
         $highlight = Users::get("id") == $a["userid"] ? " bgcolor=#fff" : "";
-        if ($a["downloaded"]) {
-            $ratio = $a["uploaded"] / $a["downloaded"];
-            $color = get_ratio_color($ratio);
-            $ratio = number_format($ratio, 2);
-            if ($color) {
-                $ratio = "<font color=#ffff00>$ratio</font>";
-            }
-        } else {
-            $ratio = "Inf.";
-        }
+        $userratio = $a["downloaded"] > 0 ? number_format($a["uploaded"] / $a["downloaded"], 1) : "---";
         
         print("<tbody><tr>
             <td>$num</td>
@@ -35,7 +26,7 @@ Style::begin($title);
             <td><font color=limegreen>" . mksize($a["upspeed"]) . "/s" . "</font></td>
             <td><font color=#FF2400>" . mksize($a["downloaded"]) . "</font></td>
             <td><font color=#FF2400>" . mksize($a["downspeed"]) . "/s" . "</font></td>
-            <td>" . $ratio . "</td>
+            <td>" . get_ratio_color($userratio) . "</td>
             <td>" . gmdate("d-M-Y", strtotime($a["added"])) . " (" . TimeDate::get_elapsed_time(TimeDate::sql_timestamp_to_unix_timestamp($a["added"])) . " ago)</td>
             </tr><tbody>");
     }

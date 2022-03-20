@@ -28,37 +28,26 @@ for ($i = 0; $i <= $data['zerofix']; $i++) {
         $dayUpload = $uploaded / $days[0];
         $dayDownload = $downloaded / $days[0];
     }
-        $torrentinfo = $upperresult->fetch(PDO::FETCH_LAZY);
-        $numtorrents = $upperresult->rowCount();
-    if ($downloaded > 0) {
-        $ratio = $uploaded / $downloaded;
-        $ratio = number_format($ratio, 3);
-        $color = get_ratio_color($ratio);
-        if ($color) {
-            $ratio = "<font color='$color'>$ratio</font>";
-        }
-    } else
-        if ($uploaded > 0) {
-            $ratio = "Inf.";
-        } else {
-            $ratio = "---";
-        }
-        $counter = $i + 1;
-        echo "<tr>";
-        echo "<td align='center class='table_col1'>$counter.</td>";
-        echo "<td class='table_col2'><a href='" . URLROOT . "/profile?id=$id'>$username</a></td>";
-        echo "<td class='table_col1'>" . mksize($uploaded) . "</td>";
-        echo "<td class='table_col2'>" . mksize($downloaded) . "</td>";
-        echo "<td class='table_col1'>$ratio</td>";
-        if ($numtorrents == 0) {
-            echo "<td class='table_col2'><font color='red'>$numtorrents torrents</font></td>";
-        } else {
-            echo "<td class=table_col2>$numtorrents torrents</td>";
-        }
-        echo "<td class='table_col1'>" . mksize($dayUpload) . "</td>";
-        echo "<td align='center' class='table_col2'><a href='messages/create?id=$id'>PM</a></td>";
-        echo "<td class='table_col1'>" . $joindate . "</td>";
-        echo "</tr>";
+    $torrentinfo = $upperresult->fetch(PDO::FETCH_LAZY);
+    $numtorrents = $upperresult->rowCount();
+
+    $userratio = $downloaded > 0 ? number_format($uploaded / $downloaded, 1) : "---";
+    $counter = $i + 1;
+    echo "<tr>";
+    echo "<td align='center class='table_col1'>$counter.</td>";
+    echo "<td class='table_col2'><a href='" . URLROOT . "/profile?id=$id'>$username</a></td>";
+    echo "<td class='table_col1'>" . mksize($uploaded) . "</td>";
+    echo "<td class='table_col2'>" . mksize($downloaded) . "</td>";
+    echo "<td class='table_col1'>".get_ratio_color($userratio)."</td>";
+    if ($numtorrents == 0) {
+        echo "<td class='table_col2'><font color='red'>$numtorrents torrents</font></td>";
+    } else {
+        echo "<td class=table_col2>$numtorrents torrents</td>";
+    }
+    echo "<td class='table_col1'>" . mksize($dayUpload) . "</td>";
+    echo "<td align='center' class='table_col2'><a href='messages/create?id=$id'>PM</a></td>";
+    echo "<td class='table_col1'>" . $joindate . "</td>";
+    echo "</tr>";
 
 }
 echo "</table><br /><br />";

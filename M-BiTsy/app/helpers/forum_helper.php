@@ -329,14 +329,7 @@ function posterdetails($userid) {
         $useruploaded = mksize($arr2["uploaded"]);
         $privacylevel = $arr2["privacy"];
         $usersignature = stripslashes(format_comment($arr2["signature"]));
-        if ($arr2["downloaded"] > 0) {
-            $userratio = number_format($arr2["uploaded"] / $arr2["downloaded"], 2);
-        } else
-        if ($arr2["uploaded"] > 0) {
-            $userratio = "Inf.";
-        } else {
-            $userratio = "---";
-        }
+        $userratio = $arr2["downloaded"] > 0 ? number_format($arr2["uploaded"] / $arr2["downloaded"], 1) : "---";
         if (!$arr2["country"]) {
             $usercountry = "unknown";
         } else {

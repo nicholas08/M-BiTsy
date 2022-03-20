@@ -10,13 +10,7 @@ if ($_SESSION['loggedin']) {
     $countslot = DB::run("SELECT DISTINCT torrent FROM peers WHERE userid =?  AND seeder=?", [Users::get('id'), 'yes']);
     $maxslotdownload = $countslot->rowCount();
     $slots = number_format(Users::get("maxslots")) . "/" . number_format($maxslotdownload);
-    if (Users::get("uploaded") > 0 && Users::get("downloaded") == 0) {
-        $userratio = '<span class="label label-success pull-right">Inf.</span>';
-    } elseif (Users::get("downloaded") > 0) {
-        $userratio = '<span class="label label-info pull-right">' . number_format(Users::get("uploaded") / Users::get("downloaded") , 2). '</span>';
-    } else {
-        $userratio = '<span class="label label-info pull-right">---</span>';
-    }
+    $userratio = Users::get("downloaded") > 0 ? number_format(Users::get("uploaded") / Users::get("downloaded"), 1) : "---";
 
     Style::block_begin("<a href=". URLROOT ."/profile?id=".Users::get('id').">". Users::coloredname(Users::get('username'))."</b></a>");
     ?>
@@ -26,8 +20,8 @@ if ($_SESSION['loggedin']) {
 		<li class="list-group-item"><?php echo Lang::T("UPLOADED"); ?>: <span class="label label-success pull-right"><?php echo $useruploaded; ?></span></li>
 		<li class="list-group-item"><?php echo Lang::T("CLASS"); ?>: <div class="pull-right"><?php echo Lang::T(Users::get("level")); ?></div></li>
 		<li class="list-group-item"><?php echo Lang::T("ACCOUNT_PRIVACY_LVL"); ?>: <div class="pull-right"><?php echo $privacylevel; ?></div></li>
-		<li class="list-group-item"><?php echo Lang::T("Seed Bonus"); ?>: <a href="<?php echo URLROOT; ?>/bonus"><div class="pull-right"><?php echo Users::get('seedbonus'); ?></div></a></span></li>
-		<li class="list-group-item"><?php echo Lang::T("RATIO"); ?>: <?php echo $userratio; ?></span></li>
+		<li class="list-group-item"><?php echo Lang::T("Seed Bonus"); ?>: <div class="pull-right"><a href="<?php echo URLROOT; ?>/bonus"><?php echo Users::get('seedbonus'); ?></div></a></span></li>
+		<li class="list-group-item"><?php echo Lang::T("RATIO"); ?>: <div class="pull-right"><?php echo get_ratio_color($userratio); ?></div></span></li>
 		<li class="list-group-item"><?php echo Lang::T("Available Slots"); ?>: <div class="pull-right"><?php echo $slots; ?></div></span></li>
     </ul>
     <br />

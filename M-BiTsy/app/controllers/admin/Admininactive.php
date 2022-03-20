@@ -37,8 +37,7 @@ class Admininactive
             print("<td class=table_head align='center'><input type='checkbox' name='checkall' onclick='checkAll(this.form.id);' /></td>");
 
             while ($arr = $res->fetch(PDO::FETCH_ASSOC)) {
-                $ratio = ($arr["downloaded"] > 0 ? number_format($arr["uploaded"] / $arr["downloaded"], 3) : ($arr["uploaded"] > 0 ? "Inf." : "---"));
-                $ratio = "<font color=" . get_ratio_color($ratio) . ">$ratio</font>";
+                $userratio = $arr["downloaded"] > 0 ? number_format($arr["uploaded"] / $arr["downloaded"], 1) : "---";
                 $downloaded = mksize($arr["downloaded"]);
                 $uploaded = mksize($arr["uploaded"]);
                 $last_seen = (($arr["last_access"] == null) ? "never" : "" . TimeDate::get_elapsed_time(TimeDate::sql_timestamp_to_unix_timestamp($arr["last_access"])) . "&nbsp;ago");
@@ -48,7 +47,7 @@ class Admininactive
                 print("<td><a href='" . URLROOT . "/profile?id=" . $arr["id"] . "'>" . Users::coloredname($arr["id"]) . "</a></td>"); //=== Use this line if you did not have the function class_user ===//
                 print("<td>" . $class . "</td>");
                 print("<td>" . ($arr["ip"] == "" ? "----" : $arr["ip"]) . "</td>");
-                print("<td><b>" . $ratio . "</b><font class='small'> | Dl:<font color=red><b>" . $downloaded . "</b></font> | Up:<font color=lime><b>" . $uploaded . "</b></font></font></td>");
+                print("<td><b>" . get_ratio_color($userratio) . "</b><font class='small'> | Dl:<font color=red><b>" . $downloaded . "</b></font> | Up:<font color=lime><b>" . $uploaded . "</b></font></font></td>");
                 print("<td>" . $joindate . "</td>");
                 print("<td>" . $last_seen . "</td>");
                 print("<td><input type='checkbox' name='userid[]' value='$arr[id]' /></td>");

@@ -175,23 +175,7 @@ echo "&nbsp;-&nbsp;[<a href='" . URLROOT . "/adminsearch/advancedsearch'>Reset</
             }
 
         }
-        // ratio as a string
-        function ratios($up, $down, $color = true)
-        {
-            if ($down > 0) {
-                $r = number_format($up / $down, 2);
-                if ($color) {
-                    $r = "<font color='" . get_ratio_color($r) . "'>$r</font>";
-                }
 
-            } elseif ($up > 0) {
-                $r = "Inf.";
-            } else {
-                $r = "---";
-            }
-
-            return $r;
-        }
         // checks for the usual wildcards *, ? plus mySQL ones
         function haswildcard($text)
         {
@@ -612,8 +596,7 @@ echo "&nbsp;-&nbsp;[<a href='" . URLROOT . "/adminsearch/advancedsearch'>Reset</
                     } else {
                         $ipstr = "---";
                     }
-                    $pul = $user['uploaded'];
-                    $pdl = $user['downloaded'];
+                    $userratio = $user["downloaded"] > 0 ? number_format($user["uploaded"] / $user["downloaded"], 1) : "---";
                     $auxres = DB::run("SELECT COUNT(DISTINCT p.id) FROM forum_posts AS p LEFT JOIN forum_topics as t ON p.topicid = t.id
 			LEFT JOIN forum_forums AS f ON t.forumid = f.id WHERE p.userid = " . $user['id'] . " AND f.minclassread <= " .
                         Users::get('class'));
@@ -628,7 +611,7 @@ echo "&nbsp;-&nbsp;[<a href='" . URLROOT . "/adminsearch/advancedsearch'>Reset</
                     "<td class='table_col1' align='center'>" . $user['last_access'] . "</td>" .
                     "<td class='table_col2' align='center'>" . $user['status'] . "</td>" .
                     "<td class='table_col1' align='center'>" . $user['enabled'] . "</td>" .
-                    "<td class='table_col2' align='center'>" . ratios($pul, $pdl) . "</td>" .
+                    "<td class='table_col2' align='center'>" . get_ratio_color($userratio) . "</td>" .
                     "<td class='table_col1' align='center'>" . mksize($user['uploaded']) . "</td>" .
                     "<td class='table_col2' align='center'>" . mksize($user['downloaded']) . "</td>" .
                     "<td class='table_col1' align='center'>$n_posts " . Lang::N("POST", $n_posts) . "<br />$n_comments " . Lang::N("COMMENT", $n_comments) . "</td>" .

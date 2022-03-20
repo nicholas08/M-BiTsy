@@ -10,14 +10,7 @@
 <th><?php echo Lang::T('RATIO') ?></th></tr></thead>
 <?php
 while ($arr = $data['res']->fetch(PDO::FETCH_ASSOC)) {
-   if ($arr["downloaded"] > 0) {
-        $ratio = number_format($arr["uploaded"] / $arr["downloaded"], 3);
-        $ratio = "<font color=" . get_ratio_color($ratio) . ">$ratio</font>";
-    } elseif ($arr["uploaded"] > 0) {
-        $ratio = "Inf.";
-    } else {
-        $ratio = "---";
-    }
+    $userratio = $arr["downloaded"] > 0 ? number_format($arr["uploaded"] / $arr["downloaded"], 1) : "---";
     $uploaded = mksize($arr["uploaded"]);
     $downloaded = mksize($arr["downloaded"]);
    
@@ -30,7 +23,7 @@ while ($arr = $data['res']->fetch(PDO::FETCH_ASSOC)) {
     <tr><td><a href='<?php echo URLROOT ?>/profile?id=<?php echo $arr['userid'] ?>'><b><?php echo $arr['username'] ?></b></a></td>
     <td><?php echo $uploaded ?></td>
     <td><?php echo $downloaded ?></td>
-    <td><?php echo $ratio ?></td></tr>
+    <td><?php echo get_ratio_color($userratio) ?></td></tr>
     <?php
 }
 print("</table></div>");

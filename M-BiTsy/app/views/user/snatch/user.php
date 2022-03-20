@@ -26,8 +26,9 @@ while ($row = $data['res']->fetch(PDO::FETCH_LAZY)):
      $result = $query->fetch();
     if ($result[0] == "yes") {$type = "" . Lang::T("EXTERNAL_TORRENT") . "";} else { $type = "" . Lang::T("LOCAL_TORRENT") . "";}
     if ($result[1] == 1) {$freeleech = "" . Lang::T("FREE") . "";} else { $freeleech = "";}
-	if ($row[3] > 0) {$ratio = number_format($row[2] / $row[3], 2);} else { $ratio = "---";}
-    $ratio = "<font color=" . get_ratio_color($ratio) . ">$ratio</font>";
+
+	$userratio = $row[3] > 0 ? number_format($row[2] / $row[3], 1) : "---";
+
 	if ($row[8] != "yes") {$hnr = "<font color=#27B500><b>" . Lang::T("NO") . "</b></font>";} else { $hnr = "<font color=#FF1200><b>" . Lang::T("YES") . "</b></font>";}
 	if ($row[9] != "yes") {$seed = "<font color=#FF1200><b>" . Lang::T("NO") . "</b></font>";} else { $seed = "<font color=#27B500><b>" . Lang::T("YES") . "</b></font>";}
     $maxchar = 30; //===| cut name length
@@ -41,7 +42,7 @@ while ($row = $data['res']->fetch(PDO::FETCH_LAZY)):
 	} ?>
 	<td><font color="#27B500"><?php echo mksize($row[2]); ?></font></td>
 	<td><font color="#FF1200"><?php echo mksize($row[3]); ?></font></td>
-	<td><?php echo $ratio; ?></td>
+	<td><?php echo get_ratio_color($userratio); ?></td>
 	<td><?php echo date('d.M.Y H:i', TimeDate::sql_timestamp_to_unix_timestamp($startdate)); ?></td>
 	<td><?php echo date('d.M.Y H:i', TimeDate::sql_timestamp_to_unix_timestamp($lastaction)); ?></td>
 	<td><?php echo ($row[6]) ? TimeDate::mkprettytime($row[6]) : '---'; ?></td>

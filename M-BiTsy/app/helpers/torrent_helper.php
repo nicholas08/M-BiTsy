@@ -1,34 +1,23 @@
 <?php
 // Function That Returns The Health Level Of A Torrent
-function health($leechers, $seeders)
+function get_ratio_color($ratio)
 {
-    if (($leechers == 0 && $seeders == 0) || ($leechers > 0 && $seeders == 0)) {
-        return 0;
-    } elseif ($seeders > $leechers) {
-        return 10;
-    }
-    $ratio = $seeders / $leechers * 100;
-    if ($ratio > 0 && $ratio < 15) {
-        return 1;
-    } elseif ($ratio >= 15 && $ratio < 25) {
-        return 2;
-    } elseif ($ratio >= 25 && $ratio < 35) {
-        return 3;
-    } elseif ($ratio >= 35 && $ratio < 45) {
-        return 4;
-    } elseif ($ratio >= 45 && $ratio < 55) {
-        return 5;
-    } elseif ($ratio >= 55 && $ratio < 65) {
-        return 6;
-    } elseif ($ratio >= 65 && $ratio < 75) {
-        return 7;
-    } elseif ($ratio >= 75 && $ratio < 85) {
-        return 8;
-    } elseif ($ratio >= 85 && $ratio < 95) {
-        return 9;
-    } else {
-        return 10;
-    }
+   if ($ratio == '---') {
+       return "<font color='FFFFFF'>$ratio</font>";
+   }
+   if ($ratio < 0.5) {
+       return "<font color='#fc0313'>$ratio</font>";
+   }
+   if ($ratio < 1) {
+       return "<font color='#fc6203'>$ratio</font>";
+   }
+   if ($ratio < 1.5) {
+       return "<font color='#ebc334'>$ratio</font>";
+   }
+   if ($ratio < 2) {
+       return "<font color='#1a7d09'>$ratio</font>";
+   }
+   return "<font color='#0d6efd'>$ratio</font>";
 }
 
 // Create Table Of Peers
@@ -39,12 +28,8 @@ function peerstable($res)
     while ($arr = $res->fetch(PDO::FETCH_LAZY)) {
         $res2 = DB::run("SELECT name,size FROM torrents WHERE id=? ORDER BY name", [$arr['torrent']]);
         $arr2 = $res2->fetch(PDO::FETCH_LAZY);
-        if ($arr["downloaded"] > 0) {
-            $ratio = number_format($arr["uploaded"] / $arr["downloaded"], 2);
-        } else {
-            $ratio = "---";
-        }
-        $ret .= "<tr><td class='table_col1'><a href=" . URLROOT . "torrent?id=$arr[torrent]&amp;hit=1'><b>" . htmlspecialchars($arr2["name"]) . "</b></a></td><td align='center' class='table_col2'>" . mksize($arr2["size"]) . "</td><td align='center' class='table_col1'>" . mksize($arr["uploaded"]) . "</td><td align='center' class='table_col2'>" . mksize($arr["downloaded"]) . "</td><td align='center' class='table_col1'>$ratio</td></tr>\n";
+        $userratio = $arr2["downloaded"] > 0 ? number_format($arr2["uploaded"] / $arr2["downloaded"], 1) : "---";
+        $ret .= "<tr><td class='table_col1'><a href=" . URLROOT . "torrent?id=$arr[torrent]&amp;hit=1'><b>" . htmlspecialchars($arr2["name"]) . "</b></a></td><td align='center' class='table_col2'>" . mksize($arr2["size"]) . "</td><td align='center' class='table_col1'>" . mksize($arr["uploaded"]) . "</td><td align='center' class='table_col2'>" . mksize($arr["downloaded"]) . "</td><td align='center' class='table_col1'>".get_ratio_color($userratio)."</td></tr>\n";
     }
     $ret .= "</table>\n";
     return $ret;
@@ -56,16 +41,16 @@ function torrenttable($res)
     // Set Waiting Time
     if (Config::get('_WAIT') && Config::get('MEMBERSONLY') && in_array(Users::get("class"), explode(",", Config::get('CLASS_WAIT')))) {
         $gigs = Users::get("uploaded") / (1024 * 1024 * 1024);
-        $ratio = ((Users::get("downloaded") > 0) ? (Users::get("uploaded") / Users::get("downloaded")) : 0);
-        if ($ratio < 0 || $gigs < 0) {
+        $userratio = Users::get("downloaded") > 0 ? number_format(Users::get("uploaded") / Users::get("downloaded"), 1) : "---";
+        if ($userratio < 0 || $gigs < 0) {
             $wait = Config::get('A_WAIT');
-        } elseif ($ratio < Config::get('RATIOA') || $gigs < Config::get('GIGSA')) {
+        } elseif ($userratio < Config::get('RATIOA') || $gigs < Config::get('GIGSA')) {
             $wait = Config::get('A_WAIT');
-        } elseif ($ratio < Config::get('RATIOB') || $gigs < Config::get('GIGSB')) {
+        } elseif ($userratio < Config::get('RATIOB') || $gigs < Config::get('GIGSB')) {
             $wait = Config::get('B_WAIT');
-        } elseif ($ratio < Config::get('RATIOC') || $gigs < Config::get('GIGSC')) {
+        } elseif ($userratio < Config::get('RATIOC') || $gigs < Config::get('GIGSC')) {
             $wait = Config::get('C_WAIT');
-        } elseif ($ratio < Config::get('RATIOD') || $gigs < Config::get('GIGSD')) {
+        } elseif ($userratio < Config::get('RATIOD') || $gigs < Config::get('GIGSD')) {
             $wait = Config::get('D_WAIT');
         } else {
             $wait = 0;
@@ -193,7 +178,7 @@ function torrenttable($res)
                     }
                     //print("<td class='ttable_col$x' nowrap='nowrap'><a href=\"" . URLROOT . "/torrent?id=$id&amp;hit=1\">$dispname</a></td>");
                     // BALLOON TOOLTIP MOD
-                    print("<td class='ttable_col$x' nowrap='nowrap'><a href=\"" . URLROOT . "/torrent?id=$id&hit=1\" onMouseover=\"return overlib('<table class=ballooncolor border=1 width=300px align=center><tr><td class=balloonheadercolor colspan=2 align=center>$smallname</td></tr><tr valign=top><td class=ballooncolor align=center><img border=0 height=200 width=120 src=".getimage($row)."></td><td width=80%  class=ballooncolor><div align=left><b>Uploaded on: </b>" . date("m-d-Y", TimeDate::utc_to_tz_time($row["added"])) . "<br /><b>Size: </b>". mksize($row["size"]) . "<br /><b>Completed: </b>" . $row["times_completed"] . "<br /></div><div align=left><b>Views: </b>" . $row["views"] . "<br />".$lang." ".$flag."<br /><b>Hits: </b>" . $row["hits"] . "<br /><b>Seeders: </b><font color=green>" . $row["seeders"] . "</font><br /><b>Leechers: </b><font color=red>" . $row["leechers"] . "</font><br /><b> Uploaded by: </b>" . $row['username'] . "</div></td></tr><tr><td class=balloonheadercolor colspan=2 align=center>".Lang::T("DESCRIPTION")."</td></tr><tr><td  class=ballooncolor colspan=2>" . $row['descr'] . "</td></tr></table>', CENTER, HEIGHT, 200, WIDTH, 300)\"; onMouseout=\"return nd()\">".$dispname."</a></td>");
+                    print("<td class='ttable_col$x' nowrap='nowrap'><a href=\"" . URLROOT . "/torrent?id=$id&hit=1\" onMouseover=\"return overlib('<table class=ballooncolor border=1 width=300px align=center><tr><td class=balloonheadercolor colspan=2 align=center>$smallname</td></tr><tr valign=top><td class=ballooncolor align=center><img border=0 height=200 width=120 src=".getimage($row)."></td><td width=80%  class=ballooncolor><div align=left><b>Uploaded on: </b>" . date("m-d-Y", TimeDate::utc_to_tz_time($row["added"])) . "<br /><b>Size: </b>". mksize($row["size"]) . "<br /><b>Completed: </b>" . $row["times_completed"] . "<br /></div><div align=left><b>Views: </b>" . $row["views"] . "<br /><b>Hits: </b>" . $row["hits"] . "<br /><b>Seeders: </b><font color=green>" . $row["seeders"] . "</font><br /><b>Leechers: </b><font color=red>" . $row["leechers"] . "</font><br /><b> Uploaded by: </b>" . $row['username'] . "</div></td></tr><tr><td class=balloonheadercolor colspan=2 align=center>".Lang::T("DESCRIPTION")."</td></tr><tr><td  class=ballooncolor colspan=2>" . $row['descr'] . "</td></tr></table>', CENTER, HEIGHT, 200, WIDTH, 300)\"; onMouseout=\"return nd()\">".$dispname."</a></td>");
                     break;
                 case 'dl':
                     print("<td class='ttable_col$x' align='center'><a href=\"" . URLROOT . "/download?id=$id&amp;name=" . rawurlencode($row["filename"]) . "\"><i class='fa fa-download' style='color:green' title='Download'></i></a></td>");
@@ -346,37 +331,34 @@ function torrenttable($res)
 // Function that assigns a color based on the value of the ratio
 function get_ratio_color($ratio)
 {
-    if ($ratio < 0.1) {
-        return "#ff0000";
-    }
-    if ($ratio < 0.2) {
-        return "#ee0000";
-    }
-    if ($ratio < 0.3) {
-        return "#dd0000";
-    }
-    if ($ratio < 0.4) {
-        return "#cc0000";
-    }
-    if ($ratio < 0.5) {
-        return "#bb0000";
-    }
-    if ($ratio < 0.6) {
-        return "#aa0000";
-    }
-    if ($ratio < 0.7) {
-        return "#990000";
-    }
-    if ($ratio < 0.8) {
-        return "#880000";
-    }
-    if ($ratio < 0.9) {
-        return "#770000";
-    }
-    if ($ratio < 1) {
-        return "#660000";
-    }
-    return "#000000";
+   if ($ratio == '---') {
+       return "<font color=FFFFFF>$ratio</font>";
+   }
+   if ($ratio < 0.1) {
+       return "<font color=#fc0313>$ratio</font>";
+   }
+   if ($ratio < 0.2) {
+       return "<font color=#fc6203>$ratio</font>";
+   }
+   if ($ratio < 0.3) {
+       return "<font color=#fcf003>$ratio</font>";
+   }
+   if ($ratio < 0.4) {
+       return "<font color=#17fc03>$ratio</font>";
+   }
+   if ($ratio < 0.5) {
+       return "<font color=#0324fc>$ratio</font>";
+   }
+   if ($ratio < 0.6) {
+       return "<font color=#fc03e8>$ratio</font>";
+   }
+   if ($ratio < 0.7) {
+       return "<font color=#6203fc>$ratio</font>";
+   }
+   if ($ratio < 0.8) {
+       return "<font color=FFFFFF>$ratio</font>";
+   }
+   return "<font color=000>$ratio</font>";
 }
 
 // Function That Returns The Image Corresponding To The Votes

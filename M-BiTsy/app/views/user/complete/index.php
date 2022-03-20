@@ -21,32 +21,13 @@ while ($row = $data['res']->fetch(PDO::FETCH_ASSOC)) {
     continue;
     }
 
-    if ($row['downloaded'] > 0)
-    {
-        $ratio = $row['uploaded'] / $row['downloaded'];
-        $ratio = number_format($ratio, 2);
-        $color = get_ratio_color($ratio);
-        if ($color)
-            $ratio = "<font color=#ff0000>$ratio</font>";
-    } else if ($row['uploaded'] > 0)
-        $ratio = 'Inf.';
-    else
-        $ratio = '---';
+    $userratio = $row["downloaded"] > 0 ? number_format($row["uploaded"] / $row["downloaded"], 1) : "---";
     
     $comdate = date("d.M.Y<\\b\\r><\\s\\m\\a\\l\\l>H:i</\\s\\m\\a\\l\\l>", TimeDate::utc_to_tz_time($row["date"]));
     $peers = (get_row_count("peers", "WHERE torrent = '$id' AND userid = '$row[id]'")) ? "<font color='#27B500'><b>".Lang::T("YES")."</b></font>" : "<font color='#FF1200'><b>".Lang::T("NO")."</b></font>";
     $res2 =  DB::raw('snatched', 'uload, dload, stime, utime, ltime, hnr', ['tid'=>$id,'uid'=>$row['id']]);
     $row2 = $res2->fetch(PDO::FETCH_ASSOC);
-    if ($row2['dload'] > 0){
-        $tratio = $row2['uload'] / $row2['dload'];
-        $tratio = number_format($tratio, 2);
-        $color = get_ratio_color($tratio);
-        if ($color)
-            $tratio = "<font color=#ff0000>$tratio</font>";
-    } else if ($row2['uload'] > 0)
-        $tratio = 'Inf.';
-    else
-        $tratio = '---';
+    $tratio = $row2['dload'] > 0 ? number_format($row2['uload'] / $row2['dload'], 1) : "---";
 
     $startdate = TimeDate::utc_to_tz(TimeDate::get_date_time($row2['stime']));
     $lastaction = TimeDate::utc_to_tz(TimeDate::get_date_time($row2['utime']));
@@ -60,7 +41,7 @@ while ($row = $data['res']->fetch(PDO::FETCH_ASSOC)) {
     } ?>
 
     <tr>
-    <td><a href="<?php URLROOT ?>/profile?id=<?php echo $row["id"]; ?>"><b><?php echo $row["username"]; ?></b></a> | <b><?php echo $ratio; ?></b></td>
+    <td><a href="<?php URLROOT ?>/profile?id=<?php echo $row["id"]; ?>"><b><?php echo $row["username"]; ?></b></a> | <b><?php echo get_ratio_color($userratio); ?></b></td>
     <td><?php echo date('d.M.Y<\\b\\r>H:i', TimeDate::sql_timestamp_to_unix_timestamp($startdate));?></td>
     <td><?php echo $comdate; ?></td>
     <td><?php echo date('d.M.Y<\\b\\r>H:i', TimeDate::sql_timestamp_to_unix_timestamp($lastaction));?></td>

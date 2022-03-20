@@ -34,7 +34,7 @@ class Profile
         }
 
         $country = Countries::getCountryName($user['country']);
-        $ratio = $user["downloaded"] > 0 ? $user["uploaded"] / $user["downloaded"] : "---";
+        $userratio = $user["downloaded"] > 0 ? number_format($user["uploaded"] / $user["downloaded"], 1) : "---";
         $numtorrents = get_row_count("torrents", "WHERE owner = $id");
         $numcomments = get_row_count("comments", "WHERE user = $id");
         $numforumposts = get_row_count("forum_posts", "WHERE userid = $id");
@@ -57,7 +57,7 @@ class Profile
             'friend' => $friend,
             'block' => $block,
             'country' => $country,
-            'ratio' => $ratio,
+            'userratio' => $userratio,
             'numhnr' => $numhnr,
             'avatar' => $avatar,
             'numtorrents' => $numtorrents,

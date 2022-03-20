@@ -19,14 +19,7 @@
 for ($i = 0; $i < $data['num']; ++$i) {
     $arr = $data['res']->fetch(PDO::FETCH_ASSOC);
     $privacylevel = $arr["privacy"];
-    if ($arr["downloaded"] > 0) {
-        $ratio = number_format($arr["uploaded"] / $arr["downloaded"], 2);
-        $ratio = "<font color=" . get_ratio_color($ratio) . "><b>$ratio</b></font>";
-    } elseif ($arr["uploaded"] > 0) {
-        $ratio = "Inf.";
-    } else {
-        $ratio = "---";
-    }
+    $userratio = $arr["downloaded"] > 0 ? number_format($arr["uploaded"] / $arr["downloaded"], 1) : "---";
     $res2 = DB::raw('users', 'username', ['id' =>$arr['filledby']]);
     $arr2 = $res2->fetch(PDO::FETCH_ASSOC);
     if ($arr2['username']) {
@@ -37,12 +30,12 @@ for ($i = 0; $i < $data['num']; ++$i) {
     
     if ($privacylevel == "strong") {
         if (Users::get("class") >= 5) {
-            $addedby = "<td class=table_col2 align=center><a href=".URLROOT."/profile?id=$arr[userid]><b>".Users::coloredname($arr['username'])." ($ratio)</b></a></td>";
+            $addedby = "<td class=table_col2 align=center><a href=".URLROOT."/profile?id=$arr[userid]><b>".Users::coloredname($arr['username'])." (".get_ratio_color($userratio).")</b></a></td>";
         } else {
             $addedby = "<td class=table_col2 align=center><a href=".URLROOT."/profile?id=$arr[userid]><b>$arr[username] (----)</b></a></td>";
         }
     } else {
-        $addedby = "<td class=table_col2 align=center><a href=".URLROOT."/profile?id=$arr[userid]><b>$arr[username] ($ratio)</b></a></td>";
+        $addedby = "<td class=table_col2 align=center><a href=".URLROOT."/profile?id=$arr[userid]><b>$arr[username] (".get_ratio_color($userratio).")</b></a></td>";
     }
     $filled = $arr['filled'];
     if ($filled) {

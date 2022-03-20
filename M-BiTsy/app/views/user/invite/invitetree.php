@@ -20,12 +20,7 @@ for ($i = 1; $i <= $data['num']; $i++) {
     if ($arr['last_access'] == '0000-00-00 00:00:00') {
         $arr['last_access'] = '---';
     }
-    if ($arr["downloaded"] != 0) {
-        $ratio = number_format($arr["uploaded"] / $arr["downloaded"], 2);
-    } else {
-        $ratio = "---";
-    }
-    $ratio = "<font color=" . get_ratio_color($ratio) . ">$ratio</font>";
+    $userratio = $arr["downloaded"] > 0 ? number_format($arr["uploaded"] / $arr["downloaded"], 1) : "---";
     if ($arr["warned"] !== "yes") {
         $warned = "<font color=limegreen><b>No</b></font>";
     } else {
@@ -44,7 +39,7 @@ for ($i = 1; $i <= $data['num']; $i++) {
 	<td><?php echo $last_access; ?></td>
 	<td><?php echo $downloaded; ?></font></td>
 	<td><?php echo $uploaded; ?></font></td>
-	<td><?php echo $ratio; ?></td>
+	<td><?php echo get_ratio_color($userratio); ?></td>
 	<td><?php echo $warned; ?></td>
     </tr></tbody>
     </table></div>

@@ -15,8 +15,8 @@ torrentmenu($data['tid']);
 </tr></thead><tbody>
 <?php
 while ($row = $data['res']->fetch(PDO::FETCH_LAZY)):
-    if ($row[6] > 0) {$ratio = number_format($row[5] / $row[6], 2);} else { $ratio = "---";}
-    $ratio = "<font color=" . get_ratio_color($ratio) . ">$ratio</font>";
+
+	$userratio = $row[6] > 0 ? number_format($row[5] / $row[6], 1) : "---";
     $startdate = TimeDate::utc_to_tz(TimeDate::get_date_time($row[7]));
     $lastaction = TimeDate::utc_to_tz(TimeDate::get_date_time($row[8]));
     if ($row[11] != "yes") {$hnr = "<font color=#27B500><b>" . Lang::T("NO") . "</b></font>";} else { $hnr = "<font color=#FF1200><b>" . Lang::T("YES") . "</b></font>";}
@@ -26,7 +26,7 @@ while ($row = $data['res']->fetch(PDO::FETCH_LAZY)):
 	<td><a href="<?php echo URLROOT ?>/profile?id=<?php echo $row[0]; ?>"><?php echo "<b>" . $row[1] . "</b>"; ?></a></td>
 	<td><font color="#27B500"><?php echo mksize($row[5]); ?></font></td>
 	<td><font color="#FF1200"><?php echo mksize($row[6]); ?></font></td>
-	<td><?php echo $ratio; ?></td>
+	<td><?php echo get_ratio_color($userratio); ?></td>
 	<td><?php echo date('d.M.Y H:i', TimeDate::sql_timestamp_to_unix_timestamp($startdate)); ?></td>
 	<td><?php echo date('d.M.Y H:i', TimeDate::sql_timestamp_to_unix_timestamp($lastaction)); ?></td>
 	<td><?php echo ($row[9]) ? TimeDate::mkprettytime($row[9]) : '---'; ?></td>

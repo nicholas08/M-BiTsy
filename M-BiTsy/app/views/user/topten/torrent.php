@@ -16,12 +16,7 @@ Style::begin($title);
     $num = 0;
     while ($a = $res->fetch(PDO::FETCH_ASSOC)) {
         ++$num;
-        if ($a["leechers"]) {
-            $r = $a["seeders"] / $a["leechers"];
-            $ratio = "<font color=#ff9900>" . number_format($r, 2) . "</font>";
-        } else {
-            $ratio = "Inf.";
-        }
+        $userratio = $a["leechers"] > 0 ? number_format($a["seeders"] / $a["leechers"], 1) : "---";
         print("<tbody><tr>
             <td>$num</td>
             <td><a href=".URLROOT."/torrent?id=" . $a["id"] . "&hit=1><b>" . $a["name"] . "</b></a></td>
@@ -30,7 +25,7 @@ Style::begin($title);
             <td><font color=limegreen><b>" . number_format($a["seeders"]) . "</b></font></td>
             <td><font color=red><b>" . number_format($a["leechers"]) . "</b></font></td>
             <td>" . ($a["leechers"] + $a["seeders"]) . "</td>
-            <td>$ratio</td>
+            <td>".get_ratio_color($userratio)."</td>
              </tr><tbody>");
     }
 print("</table></div>");
