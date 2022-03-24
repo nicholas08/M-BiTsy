@@ -18,10 +18,7 @@ class Download
                 Redirect::autolink(URLROOT, Lang::T("DOWNLOADBAN"));
             }
         }
-        if (Users::get("view_torrents") != "yes" && Config::get('MEMBERSONLY')) {
-            Redirect::autolink(URLROOT, Lang::T("NO_TORRENT_VIEW"));
-        }
-		
+
         // Get The Id
         $id = (int) Input::get("id");
 
@@ -44,7 +41,7 @@ class Download
         // Thanks
         if (Config::get('FORCETHANKS') && $_SESSION['loggedin']) {
             if (Users::get("id") != $row["owner"]) {
-                $like = DB::select('thanks', 'user', ['thanked' => $id, 'type' => 'torrent', 'user' => Users::get('id')]);
+                $like = DB::select('thanks', 'user', ['thanked'=>$id, 'type'=>'torrent', 'user'=>Users::get('id')]);
                 if (!$like) {
                     Redirect::autolink($_SERVER['HTTP_REFERER'], Lang::T("PLEASE_THANK"));
                 }
@@ -82,15 +79,9 @@ class Download
                 DB::update('users', ['passkey'=>$passkey], ['id'=>Users::get('id')]);
             }
         }
-
+        
         // Check passkey
-        if (Users::get('passkey')) {
-            $passkey = Users::get('passkey');
-        } elseif ($_GET["passkey"]) {
-            $passkey = $_GET["passkey"];
-        } else {
-            $passkey = "";
-        }
+        $passkey = $_GET["passkey"] ? $_GET["passkey"] : Users::get('passkey');
 
         // Local Torrent To Add Passkey
         if ($row["external"] != 'yes') {
@@ -136,9 +127,10 @@ class Download
 
         $switchimage = UPLOADDIR . "/attachment/$file_hash.data";
         if (file_exists($switchimage)) {
-            //list($width, $height) = getimagesize($plik); 
+            //list($width, $height) = getimagesize($plik);
             ?> 
             <img alt="test image" src="<?php echo data_uri($switchimage, $file_hash); ?>"> <?php
         }
     }
+
 }
